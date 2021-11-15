@@ -161,7 +161,7 @@ class Client:
     def disconnect(self, token, channel_id, thing_id):
         self.__http_do(
             path="/api-gw/v1/thing/%s/channel/%s" % (thing_id, channel_id),
-            method="post",
+            method="delete",
             token=token,
         )
 
@@ -210,7 +210,7 @@ class Client:
             "metadata": body["metadata"]
         }
 
-    def list_channel_by_user(self, token,  offset=0, limit=10, order=Directions.Asc, direction=ThingOrders.ID):
+    def list_channels_by_user(self, token,  offset=0, limit=10, order=Directions.Asc, direction=ThingOrders.ID):
         response = self.__http_do(
             path="/api-gw/v1/channel/list",
             method="get",
