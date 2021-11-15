@@ -1,3 +1,4 @@
+from src.enums import Directions, ThingOrders
 import requests
 import json
 
@@ -69,7 +70,87 @@ class Client:
             "created_by": jsonBody.get("createdBy")
         }
 
-    def __http_do(self, path, method, token, data):
+    def create_thing(self, token, name, metadata):
+        self.__http_do(
+            path="/api-gw/v1/thing",
+            method="post",
+            token=token,
+            data={
+                "name": name,
+                "metadata": metadata,
+            },
+        )
+
+    def list_things_by_user(self, token, offset=0, limit=10, direction=Directions.Asc, order=ThingOrders.ID):
+        response = self.__http_do(
+            path="/api-gw/v1/thing/list",
+            method="get",
+            token=token,
+            data={
+                "offset": offset,
+                "limit": limit,
+                "dir": direction,
+                "order": order,
+            }
+        )
+
+        return response.json()
+
+    def delete_thing(self, token, thing_id):
+        self.__http_do(
+            path="/api-gw/v1/thing/"+thing_id,
+            method="delete",
+            token=token,
+        )
+
+    def thing_profile(self, token, thing_id):
+        response = self.__http_do(
+            path="/api-gw/v1/thing/"+thing_id,
+            method="get",
+            token=token,
+        )
+
+        body = response.json()
+
+        return {
+            "id": body.get("id"),
+            "key": body.get("key"),
+            "name": body.get("name"),
+            "metadata": body.get("metadata")
+        }
+
+    def update_thing(self, token, thing_id, name, metadata=None):
+        self.__http_do(
+            path="/api-gw/v1/thing",
+            method="put",
+            token=token,
+            data={
+                "id": thing_id,
+                "name": name,
+                "metadata": metadata,
+            }
+        )
+
+    def list_channels_by_thing(self, token, thing_id, offset=0, limit=10, order=Directions.Asc, direction=ThingOrders.ID, disconnected=False):
+        response = self.__http_do(
+            path='/api-gw/v1/thing/%s/channels' % thing_id,
+            method="get",
+            token=token,
+            data={
+                "offset": offset,
+                "limit": limit,
+                "order": order,
+                "dir": direction,
+                "disconnected": disconnected,
+            },
+        )
+
+        return response.json()
+
+    def connect(self, token):
+        pass
+
+    def __http_do(self, path, method, token, data=None):
         headers = {}
 
         if token:

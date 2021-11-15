@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="aiot",
-    version="0.0.1",
+    version="0.0.4",
     description="aiot sdk in python",
     url="https://github.com/mobifone-aiot/aiot-python",
     author="Đào Ngọc Thành",
