@@ -147,8 +147,82 @@ class Client:
 
         return response.json()
 
-    def connect(self, token):
-        pass
+    def connect(self, token, channel_ids, thing_ids):
+        self.__http_do(
+            path="/api-gw/v1/thing/connect",
+            method="post",
+            token=token,
+            data={
+                "channel_ids": channel_ids,
+                "thing_ids": thing_ids,
+            },
+        )
+
+    def disconnect(self, token, channel_id, thing_id):
+        self.__http_do(
+            path="/api-gw/v1/thing/%s/channel/%s" % (thing_id, channel_id),
+            method="post",
+            token=token,
+        )
+
+    def create_channel(self, token, name, metadata=None):
+        self.__http_do(
+            path="/api-gw/v1/channel",
+            method="post",
+            token=token,
+            data={
+                "name": name,
+                "metadata": metadata,
+            },
+        )
+
+    def update_channel(self, token, thing_id, name, metadata=None):
+        self.__http_do(
+            path="/api-gw/v1/channel",
+            method="put",
+            token=token,
+            data={
+                "id": thing_id,
+                "name": name,
+                "metadata": metadata,
+            },
+        )
+
+    def delete_channel(self, token, channel_id):
+        self.__http_do(
+            path="/api-gw/v1/channel/" + channel_id,
+            method="delete",
+            token=token,
+        )
+
+    def channel_profile(self, token, channel_id):
+        response = self.__http_do(
+            path="/api-gw/v1/channel/" + channel_id,
+            method="get",
+            token=token,
+        )
+
+        body = response.json()
+
+        return {
+            "id": body["id"],
+            "name": body["name"],
+            "metadata": body["metadata"]
+        }
+
+    def list_channel_by_user(self, token,  offset=0, limit=10, order=Directions.Asc, direction=ThingOrders.ID):
+        response = self.__http_do(
+            path="/api-gw/v1/channel/list",
+            method="get",
+            token=token,
+            data={
+                "offset": offset,
+                "limit": limit,
+                "order": order,
+                "direction": direction
+            }
+        )
+        return response.json()
 
     def __http_do(self, path, method, token, data=None):
         headers = {}
