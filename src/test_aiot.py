@@ -239,6 +239,82 @@ def test_disconnect():
     assert(len(response["data"]) == 0)
 
 
+def test_create_gateway():
+    cleanup()
+
+    client = Client(gatewayAddr)
+    token = client.token(validEmail, validPassword)
+
+    things = create_things(token, 1)
+
+    client.create_gateway(token, things[0]["id"], "demo-1", "demo-1")
+
+    lists = client.list_gateway(token)
+    assert(len(lists) == 1)
+    assert(lists[0]["name"] == "demo-1")
+
+
+def test_update_gateway():
+    cleanup()
+
+    client = Client(gatewayAddr)
+    token = client.token(validEmail, validPassword)
+    things = create_things(token, 1)
+
+    client.create_gateway(token, things[0]["id"], "demo-1", "demo-1")
+
+    lists = client.list_gateway(token)
+    assert(len(lists) == 1)
+
+
+def test_delete_gateway():
+    cleanup()
+
+    client = Client(gatewayAddr)
+    token = client.token(validEmail, validPassword)
+    things = create_things(token, 1)
+
+    client.create_gateway(token, things[0]["id"], "demo-1", "demo-1")
+
+    lists = client.list_gateway(token)
+    assert(len(lists) == 1)
+
+    client.delete_gateway(token, lists[0]["id"])
+    lists = client.list_gateway(token)
+    assert(len(lists) == 0)
+
+
+def test_gateway_profile():
+    cleanup()
+
+    client = Client(gatewayAddr)
+    token = client.token(validEmail, validPassword)
+    things = create_things(token, 1)
+
+    client.create_gateway(token, things[0]["id"], "demo-1", "demo-1")
+    lists = client.list_gateway(token)
+
+    gateway = client.gateway_profile(token, lists[0]["id"])
+    assert(gateway["name"] == "demo-1")
+
+
+def test_list_gateway():
+    cleanup()
+
+    client = Client(gatewayAddr)
+    token = client.token(validEmail, validPassword)
+
+    lists = client.list_gateway(token)
+    assert(len(lists) == 0)
+
+    things = create_things(token, 1)
+    client.create_gateway(token, things[0]["id"], "demo-1", "demo-1")
+
+    lists = client.list_gateway(token)
+    assert(len(lists) == 1)
+    assert(lists[0]["name"] == "demo-1")
+
+
 def cleanup():
     client = Client(gatewayAddr)
     token = client.token(validEmail, validPassword)
@@ -250,6 +326,10 @@ def cleanup():
     things = client.list_things_by_user(token)
     for thing in things["data"]:
         client.delete_thing(token, thing["id"])
+
+    gateways = client.list_gateway(token)
+    for g in gateways:
+        client.delete_gateway(token, g["id"])
 
 
 def create_things(token, count):

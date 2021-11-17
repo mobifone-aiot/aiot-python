@@ -65,8 +65,9 @@ class Client:
             "fullname": jsonBody.get("fullName"),
             "phone_number": jsonBody.get("phoneNumber"),
             "customer_id": jsonBody.get("customerId"),
-            "user_type_id": jsonBody.get("userTypeId"),
-            "user_status_id": jsonBody.get("userGroupId"),
+            "user_status_id": jsonBody.get("userStatusId"),
+            "user_group_id": jsonBody.get("userGroupId"),
+            "description": jsonBody.get("desc"),
             "created_by": jsonBody.get("createdBy")
         }
 
@@ -222,6 +223,102 @@ class Client:
                 "direction": direction
             }
         )
+        return response.json()
+
+    def create_gateway(self, token, thing_id, name, description=None):
+        self.__http_do(
+            path="/api-gw/v1/gateway/create",
+            method="post",
+            token=token,
+            data={
+                "name": name,
+                "thingId": thing_id,
+                "description": description
+            }
+        )
+
+    def upate_gateway(self, token, gate_id, name, description):
+        self.__http_do(
+            path="/api-gw/v1/gateway/edit",
+            method="put",
+            token=token,
+            data={
+                "id": gate_id,
+                "name": name,
+                "description": description
+            }
+        )
+
+    def delete_gateway(self, token, gate_id):
+        self.__http_do(
+            path="/api-gw/v1/gateway/" + gate_id,
+            method="delete",
+            token=token,
+        )
+
+    def gateway_profile(self, token, gate_id):
+        response = self.__http_do(
+            path="/api-gw/v1/gateway/" + gate_id,
+            method="get",
+            token=token,
+        )
+
+        body = response.json()
+
+        return {
+            "id": body["gatewayId"],
+            "name": body["gatewayName"],
+            "description": body["gatewayDes"],
+            "owner": body["gatewayOwner"],
+            "underlay_thing": {
+                "id": body["thingId"],
+                "name": body["thingName"],
+                "key": body["thingKey"],
+                "metadata": body["metadata"]
+            }
+        }
+
+    def list_gateway(self, token):
+        response = self.__http_do(
+            path="/api-gw/v1/gateway/list",
+            method="get",
+            token=token,
+        )
+
+        ret = []
+
+        for gateway in response.json():
+            ret.append({
+                "id": gateway["gatewayId"],
+                "name": gateway["gatewayName"],
+                "description": gateway["gatewayDes"],
+                "owner": gateway["gatewayOwner"],
+                "underlay_thing": {
+                    "id": gateway["thingId"],
+                    "name": gateway["thingName"],
+                    "key": gateway["thingKey"],
+                    "metadata": gateway["metadata"]
+                }
+            })
+
+        return ret
+
+    def gateway_status(self, token):
+        response = self.__http_do(
+            path="/api-gw/v1/gateway/status",
+            method="get",
+            token=token,
+        )
+
+        return response.json()
+
+    def gateway_active_device_count(self, token, gate_id):
+        response = self.__http_do(
+            "/api-gw/v1/gateway/active-device-count/" + gate_id,
+            method="get",
+            token=token,
+        )
+
         return response.json()
 
     def __http_do(self, path, method, token, data=None):
