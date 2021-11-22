@@ -66,7 +66,6 @@ class Client:
             "phone_number": jsonBody.get("phoneNumber"),
             "customer_id": jsonBody.get("customerId"),
             "user_status_id": jsonBody.get("userStatusId"),
-            "user_group_id": jsonBody.get("userGroupId"),
             "description": jsonBody.get("desc"),
             "created_by": jsonBody.get("createdBy")
         }
